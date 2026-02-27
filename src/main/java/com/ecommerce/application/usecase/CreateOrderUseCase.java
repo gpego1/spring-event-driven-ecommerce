@@ -2,14 +2,12 @@ package com.ecommerce.application.usecase;
 
 import com.ecommerce.application.dto.CreateOrderRequest;
 import com.ecommerce.application.dto.OrderResponse;
-import com.ecommerce.domain.entity.Order;
-import com.ecommerce.domain.entity.OrderItem;
-import com.ecommerce.domain.entity.OrderStatus;
-import com.ecommerce.domain.entity.Product;
+import com.ecommerce.domain.entity.*;
 import com.ecommerce.domain.event.EventPublisher;
 import com.ecommerce.domain.event.OrderCreatedEvent;
 import com.ecommerce.domain.repository.OrderRepository;
 import com.ecommerce.domain.repository.UserRepository;
+import com.ecommerce.infrastructure.kafka.OrderEventProducer;
 import com.ecommerce.shared.exception.BusinessException;
 import com.ecommerce.shared.exception.ResourceNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -18,17 +16,8 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Optional;
 
-/**
- * Caso de uso para criação de pedidos.
- *
- * Fluxo principal:
- *   1. Valida usuário e itens
- *   2. Cria o pedido com status COMPLETED
- *   3. Persiste
- *   4. Gera OrderCreatedEvent
- *   5. Publica via EventPublisher (hoje: log / futuro: Kafka)
- */
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -37,12 +26,7 @@ public class CreateOrderUseCase {
     private final OrderRepository orderRepository;
     private final UserRepository userRepository;
     private final CreateProductUseCase createProductUseCase;
-
-    /**
-     * EventPublisher é injetado via interface — o use case não sabe se é Kafka, log ou outra coisa.
-     * Para integrar Kafka: crie KafkaEventPublisher implements EventPublisher e troque a implementação.
-     */
-    private final EventPublisher eventPublisher;
+    private final OrderEventProducer eventPublisher;
 
     public OrderResponse create(CreateOrderRequest request) {
         log.info("Iniciando criação de pedido para userId: {}", request.userId());
@@ -56,6 +40,7 @@ public class CreateOrderUseCase {
 
         Order order = Order.builder()
                 .userId(request.userId())
+                .userEmail(request.userEmail())
                 .status(OrderStatus.COMPLETED)
                 .totalAmount(BigDecimal.ZERO)
                 .build();
@@ -71,9 +56,9 @@ public class CreateOrderUseCase {
         }
 
         Order saved = orderRepository.save(order);
+
         log.info("Pedido {} criado com status {} e total {}", saved.getId(), saved.getStatus(), saved.getTotalAmount());
 
-        // Gera e publica o evento de domínio
         OrderCreatedEvent event = buildEvent(saved);
         eventPublisher.publish(event);
 
@@ -106,8 +91,10 @@ public class CreateOrderUseCase {
         return OrderCreatedEvent.builder()
                 .orderId(order.getId())
                 .userId(order.getUserId())
+                .userEmail(order.getUserEmail())
                 .items(itemData)
                 .totalAmount(order.getTotalAmount())
                 .build();
     }
+
 }

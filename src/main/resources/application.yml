@@ -4,6 +4,8 @@ server:
 spring:
   application:
     name: ecommerce-service
+  kafka:
+    bootstrap-servers: ${BOOTSTRAP_SERVER_URI}
 
   datasource:
     url: ${SPRING_DATASOURCE_URL}

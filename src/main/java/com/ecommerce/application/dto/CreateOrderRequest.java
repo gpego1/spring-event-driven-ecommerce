@@ -7,6 +7,7 @@ import java.util.List;
 
 public record CreateOrderRequest(
         @NotNull(message = "userId é obrigatório") Long userId,
+        @NotNull(message = "userEmail é obrigatório") String userEmail,
         @NotNull(message = "items é obrigatório") List<OrderItemRequest> items
 ) {
     public record OrderItemRequest(

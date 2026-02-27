@@ -5,10 +5,7 @@ import lombok.*;
 
 import java.math.BigDecimal;
 
-/**
- * Entidade de domínio OrderItem.
- * Representa um produto dentro de um pedido com preço capturado no momento da compra.
- */
+
 @Entity
 @Table(name = "order_items")
 @Getter
@@ -32,9 +29,6 @@ public class OrderItem {
     @Column(nullable = false)
     private Integer quantity;
 
-    /**
-     * Preço congelado no momento da compra — garante rastreabilidade histórica.
-     */
     @Column(nullable = false, precision = 10, scale = 2)
     private BigDecimal price;
 

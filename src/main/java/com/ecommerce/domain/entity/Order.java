@@ -9,10 +9,6 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Entidade agregado-raiz de pedido.
- * Contém a lógica de adição de itens e cálculo do total dentro do próprio domínio.
- */
 @Entity
 @Table(name = "orders")
 @Getter
@@ -28,6 +24,8 @@ public class Order {
 
     @Column(name = "user_id", nullable = false)
     private Long userId;
+
+    private String userEmail;
 
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
