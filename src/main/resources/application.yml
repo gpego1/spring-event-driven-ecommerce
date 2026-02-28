@@ -5,7 +5,14 @@ spring:
   application:
     name: ecommerce-service
   kafka:
-    bootstrap-servers: ${BOOTSTRAP_SERVER_URI}
+    bootstrap-servers: ${BOOTSTRAP_SERVERS}
+    producer:
+      properties:
+        spring.json.trusted.packages: "*"
+      admin:
+        properties:
+          bootstrap-servers: ${BOOTSTRAP_SERVERS}
+        auto-create: true
 
   datasource:
     url: ${SPRING_DATASOURCE_URL}
