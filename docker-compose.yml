@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   db:
     image: postgres:16-alpine
@@ -37,32 +35,53 @@ services:
       SPRING_DATASOURCE_URL: ${SPRING_DATASOURCE_URL}
       SPRING_DATASOURCE_USERNAME: ${SPRING_DATASOURCE_USERNAME}
       SPRING_DATASOURCE_PASSWORD: ${SPRING_DATASOURCE_PASSWORD}
+      BOOTSTRAP_SERVER_URI: ${BOOTSTRAP_SERVER_URI}
     depends_on:
       db:
         condition: service_started
     networks:
       - ecommerce-network
 
+  notification-service:
+    build:
+      context: ../notification-service (1)/notification-service
+      dockerfile: Dockerfile
+    container_name: notification-service
+    depends_on:
+      - kafka
+    environment:
+      SMTP_EMAIL_USERNAME: ${SMTP_EMAIL_USERNAME}
+      SMTP_EMAIL_PASSWORD: ${SMTP_EMAIL_PASSWORD}
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: ${BOOTSTRAP_SERVER_URI}
+    networks:
+      - ecommerce-network
+    ports:
+      - "8081:8081"
+
   kafka:
-    image: bitnami/kafka:latest
+    image: apache/kafka:3.7.0
     container_name: kafka
     ports:
       - "9092:9092"
+      - "29092:29092"
     environment:
-      KAFKA_CFG_NODE_ID: 1
-      KAFKA_CFG_PROCESS_ROLES: broker,controller
-      KAFKA_CFG_CONTROLLER_QUORUM_VOTERS: 1@kafka:9093
-      KAFKA_CFG_LISTENERS: PLAINTEXT://:9092,CONTROLLER://:9093
-      KAFKA_CFG_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092
-      KAFKA_CFG_CONTROLLER_LISTENER_NAMES: CONTROLLER
-      KAFKA_CFG_LOG_DIRS: /bitnami/kafka/data
-      ALLOW_PLAINTEXT_LISTENER: "yes"
-    volumes:
-      - kafka_data:/bitnami/kafka
+      KAFKA_NODE_ID: 1
+      KAFKA_PROCESS_ROLES: broker,controller
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@kafka:9093
+
+      KAFKA_LISTENERS: PLAINTEXT://:9092,CONTROLLER://:9093,PLAINTEXT_HOST://:29092
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:29092
+
+      # Mapear protocolos
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,CONTROLLER:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+    networks:
+      - ecommerce-network
 
 volumes:
   postgres_data:
-  kafka-data:
+  kafka_data:
 
 networks:
   ecommerce-network:

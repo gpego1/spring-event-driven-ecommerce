@@ -1,6 +1,7 @@
 package com.ecommerce.infrastructure.kafka;
 import com.ecommerce.domain.event.OrderCreatedEvent;
-import com.fasterxml.jackson.databind.JsonSerializer;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.kafka.support.serializer.JsonSerializer;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.StringSerializer;
 import org.springframework.context.annotation.Bean;
@@ -15,11 +16,14 @@ import java.util.Map;
 @Configuration
 public class KafkaProducerConfig {
 
+    @Value("${spring.kafka.bootstrap-servers}")
+    private String bootsrapServers;
+
     @Bean
     public ProducerFactory<String, OrderCreatedEvent> producerFactory(){
         Map<String, Object> config = new HashMap<>();
 
-        config.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
+        config.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, bootsrapServers );
         config.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
         config.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, JsonSerializer.class);
 
