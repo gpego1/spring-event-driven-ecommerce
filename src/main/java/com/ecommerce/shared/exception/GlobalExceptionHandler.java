@@ -12,12 +12,11 @@ import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * Tratamento global de exceções — centraliza respostas de erro da API.
- */
+
 @Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+
 
     @ExceptionHandler(ResourceNotFoundException.class)
     public ResponseEntity<ErrorResponse> handleNotFound(ResourceNotFoundException ex) {

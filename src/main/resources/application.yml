@@ -5,14 +5,20 @@ spring:
   application:
     name: ecommerce-service
   kafka:
-    bootstrap-servers: ${BOOTSTRAP_SERVERS}
+    bootstrap-servers: ${SPRING_KAFKA_BOOTSTRAP_SERVERS}
     producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
       properties:
-        spring.json.trusted.packages: "*"
-      admin:
-        properties:
-          bootstrap-servers: ${BOOTSTRAP_SERVERS}
-        auto-create: true
+        spring.json.type.mapping: order.created:com.ecommerce.event.OrderCreatedEvent
+        retries: 3
+        acks: all
+        compression-type: snappy
+        linger.ms: 5
+        batch.size: 16384
+        enable.idempotence: true
+
+
 
   datasource:
     url: ${SPRING_DATASOURCE_URL}
@@ -26,7 +32,6 @@ spring:
     properties:
       hibernate:
         format_sql: true
-        dialect: org.hibernate.dialect.PostgreSQLDialect
 
 springdoc:
   swagger-ui:

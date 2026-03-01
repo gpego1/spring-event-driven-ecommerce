@@ -1,5 +1,6 @@
 package com.ecommerce.infrastructure.kafka;
 import com.ecommerce.domain.event.OrderCreatedEvent;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.support.serializer.JsonSerializer;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.StringSerializer;
@@ -15,7 +16,8 @@ import java.util.Map;
 @Configuration
 public class KafkaProducerConfig {
 
-   String KAFKA = "kafka:9092";
+    @Value("${SPRING_KAFKA_BOOTSTRAP_SERVERS}")
+   String KAFKA;
 
     @Bean
     public ProducerFactory<String, OrderCreatedEvent> producerFactory(){
