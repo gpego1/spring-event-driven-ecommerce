@@ -24,7 +24,7 @@ public class SecurityConfig {
                 )
                 .authorizeHttpRequests(authorizationManagerRequestMatcherRegistry -> authorizationManagerRequestMatcherRegistry
                         .dispatcherTypeMatchers(DispatcherType.ERROR).permitAll()
-                                .requestMatchers(HttpMethod.POST, "/users").permitAll()
+                                .requestMatchers(HttpMethod.POST, "/auth").permitAll()
                                 .anyRequest().authenticated()
                         )
                 .build();
