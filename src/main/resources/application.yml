@@ -17,7 +17,9 @@ spring:
         linger.ms: 5
         batch.size: 16384
         enable.idempotence: true
-
+  security:
+    jwt:
+      secret: ${JWT_SECRET}
 
 
   datasource:
