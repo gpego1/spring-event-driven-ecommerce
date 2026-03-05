@@ -17,10 +17,6 @@ spring:
         linger.ms: 5
         batch.size: 16384
         enable.idempotence: true
-  security:
-    jwt:
-      secret: ${JWT_SECRET}
-
 
   datasource:
     url: ${SPRING_DATASOURCE_URL}
@@ -34,6 +30,10 @@ spring:
     properties:
       hibernate:
         format_sql: true
+jwt:
+  secret: ${JWT_SECRET}
+  expiration: ${JWT_EXPIRATION}
+  refresh-expiration: ${JWT_REFRESH_EXPIRATION}
 
 springdoc:
   swagger-ui:

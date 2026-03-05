@@ -5,9 +5,6 @@ import lombok.*;
 
 import java.math.BigDecimal;
 
-/**
- * Entidade de domínio Product.
- */
 @Entity
 @Table(name = "products")
 @Getter

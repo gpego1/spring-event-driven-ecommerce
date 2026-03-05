@@ -8,20 +8,19 @@ import com.ecommerce.shared.exception.BusinessException;
 import com.ecommerce.shared.exception.ResourceNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
-/**
- * Caso de uso para operações de usuário.
- * Orquestra a lógica sem depender de detalhes de infraestrutura.
- */
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class CreateUserUseCase {
 
     private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
     public UserResponse create(CreateUserRequest request) {
         log.info("Criando usuário com email: {}", request.email());
@@ -33,6 +32,16 @@ public class CreateUserUseCase {
         User user = User.builder()
                 .name(request.name())
                 .email(request.email())
+                .password(passwordEncoder.encode(request.password()))
+                .role(request.role())
+
+                .enabled(true)
+                .loginAttempts(0)
+                .lockUntil(null)
+
+                .passwordExpiresAt(LocalDateTime.now().plusMonths(6))
+                .accountExpiresAt(LocalDateTime.now().plusYears(5))
+
                 .build();
 
         User saved = userRepository.save(user);

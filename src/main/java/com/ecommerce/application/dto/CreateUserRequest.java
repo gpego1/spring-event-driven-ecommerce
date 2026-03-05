@@ -8,5 +8,5 @@ public record CreateUserRequest(
         @NotBlank(message = "Nome é obrigatório") String name,
         @NotBlank(message = "Email é obrigatório") @Email(message = "Email inválido") String email,
         @NotBlank(message = "Senha é obrigatório") String password,
-        @NotBlank(message = "Senha é obrigatório")Roles role
+        Roles role
         ) {}
